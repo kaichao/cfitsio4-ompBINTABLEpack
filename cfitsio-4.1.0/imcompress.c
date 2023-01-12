@@ -8401,7 +8401,11 @@ int fits_compress_table(fitsfile *infptr, fitsfile *outfptr, int num_worker, int
                                 ffgbyt(infptr, rm_colwidth[ii], cptr, status);  /* copy all the bytes */
 
                                 if (rm_colwidth[ii] >= MINDIRECT) { /* have to explicitly move to next byte */
+                                    int temp_status = *status;
                                     ffmbyt(infptr, startbyte + rm_colwidth[ii], 0, status);
+                                    if (ii == ncols - 1 && ll == nchunks - 1) {
+                                        *status = temp_status;
+                                    }
                                 }
                             }  /* end of test of coltypee */
 

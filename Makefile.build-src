@@ -1,0 +1,10 @@
+SHELL := /bin/bash
+
+build-local:
+	cd ./cfitsio-4.1.0 && ./configure && C_FLAGS=`grep "CFLAGS =" < Makefile` \
+		&& echo $${C_FLAGS} && echo "$${C_FLAGS:9} -fopenmp" \
+		&& CFLAGS="$${C_FLAGS:9} -fopenmp" ./configure --prefix=/cfitsio/usr/local --enable-reentrant \
+		&& make && make fpack && make funpack
+
+install-local:
+	cd ./cfitsio-4.1.0 && make install

@@ -1,7 +1,7 @@
 FROM gcc:12.2.0
 
 COPY cfitsio-4.1.0 /source/cfitsio-4.1.0
-COPY Makefile /source/Makefile
+COPY Makefile.build-src /source/Makefile
 RUN cd /source && make build-local && make install-local
 
 RUN cd /cfitsio/usr/local/bin && strip * \
@@ -18,3 +18,18 @@ COPY --from=0 /cfitsio /
 
 ENV LD_LIBRARY_PATH=/usr/local/lib
 
+ENV \
+    # number of threads for Rice compression/decompress algorithm
+    NUM_THREADS=0 \
+    # ACTION=COMPRESS/DECOMPRESS
+    ACTION=COMPRESS \
+    SOURCE_ROOT= \
+    TARGET_ROOT= \
+    # ${UID}:${GID}, owner of processed file
+    UG= \
+    # 'yes': recheck checksum of compressed/uncompressed file(only valid for compress)
+    ENABLE_RECHECK=
+
+COPY fits-pack.sh /usr/local/bin/
+
+RUN mkdir -p /work

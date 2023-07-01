@@ -5,8 +5,10 @@ IMAGE_NAME=xxgt/cfitsio-omp-pack
 ug=`id -u`:`id -g`
 
 f=$(basename $1)
+# delete the rightmost three characters .fz
+fn=${f%???}
 
 cd $(dirname $1)
 docker run -t --rm -v ${PWD}:/data  -w /data ${IMAGE_NAME} \
-    bash -c "fpack -table -threads 0 -C ${f}; chown ${ug} $1.fz"
+    bash -c "funpack  -threads 0 -C $f; chown ${ug} ${fn}"
 cd -

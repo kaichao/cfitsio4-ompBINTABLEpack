@@ -1,5 +1,4 @@
-SHELL := /bin/bash
-IMAGE_NAME=cfitsio-omp-pack
+IMAGE_NAME=xxgt/cfitsio-omp-pack
 
 build:
 	docker build --network host -t $(IMAGE_NAME) .
@@ -7,11 +6,12 @@ build:
 push:
 	docker push $(IMAGE_NAME)
 
-build-local:
-	cd ./cfitsio-4.1.0 && ./configure && C_FLAGS=`grep "CFLAGS =" < Makefile` \
-		&& echo $${C_FLAGS} && echo "$${C_FLAGS:9} -fopenmp" \
-		&& CFLAGS="$${C_FLAGS:9} -fopenmp" ./configure --prefix=/cfitsio/usr/local --enable-reentrant \
-		&& make && make fpack && make funpack
+run:
+	docker run -it --rm --network=host --tmpfs /work -v /:/local \
+		-e SOURCE_ROOT=/tmp/a -e TARGET_ROOT=/tmp/b $(IMAGE_NAME) bash
 
-install-local:
-	cd ./cfitsio-4.1.0 && make install
+dist:
+	docker save $(IMAGE_NAME) | zstdmt | pv | ssh h12 'zstd -d | docker load'
+
+sync:
+	rsync -av . --del h12:/tmp/cfitsio4-ompBINTABLEpack
